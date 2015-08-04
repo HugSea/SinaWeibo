@@ -1,0 +1,30 @@
+//
+//  pchFile.pch
+//  SinaWeibo
+//
+//  Created by 张庆杰 on 15/7/31.
+//  Copyright (c) 2015年 QJ. All rights reserved.
+//
+
+#ifndef SinaWeibo_pchFile_pch
+#define SinaWeibo_pchFile_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+#import "UIImage+Extension.h"
+#import "UIView+Extension.h"
+#import "UIBarButtonItem+Extension.h"
+
+// 当前屏幕宽高
+#define screenW [UIScreen mainScreen].bounds.size.width
+#define screenH [UIScreen mainScreen].bounds.size.height
+
+// 颜色设置
+#define QJColor(r, g, b) [UIColor colorWithRed:(r) / 255.0 green:(g) / 255.0 blue:(b) / 255.0 alpha:1.0]
+
+// 应用信息
+#define QJClient_id @"1372814960"
+#define QJClient_secret @"71d28540918e7730cf25caff29c04a18"
+#define QJRedirect_uri @"http://www.or2z.com"
+
+#endif
