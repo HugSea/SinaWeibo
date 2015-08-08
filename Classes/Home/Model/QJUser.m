@@ -10,4 +10,8 @@
 
 @implementation QJUser
 
+-(BOOL)isVip {
+    return self.mbrank > 2;
+}
+
 @end

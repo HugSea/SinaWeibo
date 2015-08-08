@@ -10,6 +10,8 @@
 
 #import "QJAccountTool.h"
 #import "QJAccount.h"
+#import "MJExtension.h"
+#import "QJHttpTool.h"
 
 @implementation QJAccountTool
 
@@ -30,6 +32,19 @@
         account = nil;
     }
     return account;
+}
+
++(void)accessTokenWithParams:(QJAccessTokenParam *)params success:(void (^)(QJAccount *))success failure:(void (^)(NSError *))failure {
+    [QJHttpTool post:@"https://api.weibo.com/oauth2/access_token" params:params.keyValues success:^(id responseObjt) {
+        if (success) {
+            QJAccount *result = [QJAccount objectWithKeyValues:responseObjt];
+            success(result);
+        }
+    } failure:^(NSError *error) {
+        if (failure) {
+            failure(error);
+        }
+    }];
 }
 
 @end

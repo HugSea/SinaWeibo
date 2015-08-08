@@ -10,4 +10,6 @@
 
 @interface QJHomeController : UITableViewController
 
+- (void)refresh:(BOOL)fromSelf;
+
 @end

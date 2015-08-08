@@ -26,7 +26,7 @@
     int count = (int)self.subviews.count;
     CGFloat margin = 10;
     int column = 4;
-    CGFloat imageW = (screenW - (column + 1) * margin) / 4.0;
+    CGFloat imageW = (QJScreenW - (column + 1) * margin) / 4.0;
     CGFloat imageH = imageW;
     for (int i = 0; i < count; i++) {
         UIImageView *imageView = self.subviews[i];

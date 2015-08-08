@@ -66,7 +66,7 @@
     
     self.placehoderLabel.x = 5;
     self.placehoderLabel.y = 8;
-    self.placehoderLabel.width = screenW - self.placehoderLabel.x * 2;
+    self.placehoderLabel.width = QJScreenW - self.placehoderLabel.x * 2;
     CGSize maxSize = CGSizeMake(self.placehoderLabel.width, MAXFLOAT);
     CGRect placehoderRect = [self.placehoderLabel.text boundingRectWithSize:maxSize options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName : self.placehoderLabel.font} context:nil];
     self.placehoderLabel.height = placehoderRect.size.height;

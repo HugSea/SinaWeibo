@@ -12,5 +12,9 @@
 
 /** 缩略图 */
 @property (nonatomic, copy) NSString *thumbnail_pic;
+/**
+ *  大图
+ */
+@property (nonatomic, copy) NSString *bmiddle_pic;
 
 @end

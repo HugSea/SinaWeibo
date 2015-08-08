@@ -15,11 +15,16 @@
 #import "MJExtension.h"
 #import "QJStatus.h"
 #import "QJUser.h"
+#import "QJStatusTool.h"
+#import "QJUserTool.h"
+#import "QJStatusFrame.h"
+#import "QJStatusCell.h"
 
 @interface QJHomeController ()
 
-@property (nonatomic, strong) NSMutableArray *statuses;
+@property (nonatomic, strong) NSMutableArray *statusFrames;
 @property (nonatomic, strong) QJTitleButton *titleBtn;
+@property (nonatomic, weak) UIRefreshControl *refreshControl;
 
 @end
 
@@ -36,6 +41,9 @@
     
     // 获取用户昵称
     [self setupUserInfo];
+    
+    self.tableView.backgroundColor = [UIColor colorWithWhite:0.959 alpha:1.000];
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 }
 
 /**
@@ -44,15 +52,12 @@
 - (void)setupUserInfo
 {
     // 封装请求参数
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"access_token"] = [QJAccountTool account].access_token;
-    params[@"uid"] = [QJAccountTool account].uid;
+    QJUserInfoParam *params = [[QJUserInfoParam alloc] init];
+    params.access_token = [QJAccountTool account].access_token;
+    params.uid = @([[QJAccountTool account].uid longLongValue]);
     
     // 发送GET请求
-    [QJHttpTool get:@"https://api.weibo.com/2/users/show.json" params:params success:^(id responseObjt) {
-        // 字典转模型
-        QJUser *user = [QJUser objectWithKeyValues:responseObjt];
-        
+    [QJUserTool userInfoWithParams:params success:^(QJUserInfoResult *user) {
         // 设置用户的昵称为标题
         [self.titleBtn setTitle:user.name forState:UIControlStateNormal];
         
@@ -65,11 +70,11 @@
     }];
 }
 
--(NSMutableArray *)statuses {
-    if (!_statuses) {
-        _statuses = [[NSMutableArray alloc] init];
+-(NSMutableArray *)statusFrames {
+    if (!_statusFrames) {
+        _statusFrames = [[NSMutableArray alloc] init];
     }
-    return _statuses;
+    return _statusFrames;
 }
 
 - (void)setupNavBar {
@@ -94,6 +99,7 @@
 - (void)setupRefresh {
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
     [self.tableView addSubview:refreshControl];
+    self.refreshControl = refreshControl;
     
     [refreshControl addTarget:self action:@selector(refreshControlStateChange:) forControlEvents:UIControlEventValueChanged];
     
@@ -101,41 +107,75 @@
     [refreshControl beginRefreshing];
     [self refreshControlStateChange:refreshControl];
 }
+
+/**
+ *  根据微博模型数组 转成 微博frame模型数据
+ *
+ *  @param statuses 微博模型数组
+ *
+ */
+- (NSArray *)statusFramesWithStatuses:(NSArray *)statuses {
+    NSMutableArray *frames = [NSMutableArray array];
+    for (QJStatus *status in statuses) {
+        QJStatusFrame *frame = [[QJStatusFrame alloc] init];
+        // 传递微博模型数据，计算所有子控件的frame
+        frame.status = status;
+        [frames addObject:frame];
+    }
+    return frames;
+}
+
 /**
  *  刷新控件状态发生改变时调用
  */
 - (void)refreshControlStateChange:(UIRefreshControl *)refreshControl {
     
     // 创建请求参数
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"access_token"] = [QJAccountTool account].access_token;
+    QJHomeStatusesParam *params = [[QJHomeStatusesParam alloc] init];
+    params.access_token = [QJAccountTool account].access_token;
     // 如果存在微博状态信息,设置since_id属性
-    QJStatus *firstStatus = [self.statuses firstObject];
+    QJStatusFrame *firstStatusFrame = [self.statusFrames firstObject];
+    QJStatus *firstStatus = firstStatusFrame.status;
     if (firstStatus) {
-        params[@"since_id"] = firstStatus.idstr;
+        params.since_id = @([firstStatus.idstr longLongValue]);
     }
     
     // 发送GET请求
-    [QJHttpTool get:@"https://api.weibo.com/2/statuses/home_timeline.json" params:params success:^(id responseObjt) {
-        // 微博字典数组
-        NSArray *statusArray = responseObjt[@"statuses"];
-        // 微博字典数组->微博模型数组
-        NSArray *newStatuses = [QJStatus objectArrayWithKeyValuesArray:statusArray];
+    [QJStatusTool homeStatusesWithParams:params success:^(QJHomeStatusesResult *result) {
+        // 获得最新的微博frame数组
+        NSArray *newFrames = [self statusFramesWithStatuses:result.statuses];
         // 插入最新状态信息
-        NSRange range = NSMakeRange(0, newStatuses.count);
+        NSRange range = NSMakeRange(0, newFrames.count);
         NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
-        [self.statuses insertObjects:newStatuses atIndexes:indexSet];
+        [self.statusFrames insertObjects:newFrames atIndexes:indexSet];
         // 刷新tableView
         [self.tableView reloadData];
         // 结束刷新控件
         [refreshControl endRefreshing];
         // 提示用户最新微博数据数量
-        [self showNewStatusCount:(int)newStatuses.count];
+        [self showNewStatusCount:(int)newFrames.count];
     } failure:^(NSError *error) {
         NSLog(@"error = %@", error);
         [refreshControl endRefreshing];
     }];
 }
+
+/**
+ *  点击home标签刷新控件
+ */
+-(void)refresh:(BOOL)fromSelf {
+    if (self.tabBarItem.badgeValue) {
+        // 如果有数字
+        [self.refreshControl beginRefreshing];
+        // 刷新控件
+        [self refreshControlStateChange:self.refreshControl];
+    } else if (fromSelf) {
+        // 没有数字,滚动到顶部
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+        [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    }
+}
+
 /**
  *  提示用户最新微博数据数量
  *
@@ -154,7 +194,7 @@
     label.textAlignment = NSTextAlignmentCenter;
     label.textColor = [UIColor whiteColor];
     label.x = 0;
-    label.width = screenW;
+    label.width = QJScreenW;
     label.height = 35;
     label.y = 64 - label.height;
     // 添加提示框到导航控制器view
@@ -192,23 +232,15 @@
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.statuses.count;
+    return self.statusFrames.count;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
-    }
-    // 取出对应status模型
-    QJStatus *status = self.statuses[indexPath.row];
-    cell.textLabel.text = status.text;
-    // 取出对应user模型
-    QJUser *user = status.user;
-    cell.detailTextLabel.text = user.name;
-    [cell.imageView sd_setImageWithURL:[NSURL URLWithString:user.profile_image_url] placeholderImage:[UIImage imageNamed:@"avatar_default_small"]];
+    QJStatusCell *cell = [QJStatusCell cellWithTableView:tableView];
+    
+    cell.statusFrame = self.statusFrames[indexPath.row];
     
     return cell;
 }
@@ -219,49 +251,9 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    QJStatusFrame *statusFrame = self.statusFrames[indexPath.row];
+    return statusFrame.cellHeight;
 }
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

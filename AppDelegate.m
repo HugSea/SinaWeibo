@@ -13,6 +13,7 @@
 #import "QJControllerTool.h"
 #import "QJAccountTool.h"
 #import "QJAccount.h"
+#import <Availability.h>
 
 @interface AppDelegate ()
 
@@ -38,6 +39,13 @@
         self.window.rootViewController = [[QJOAuthViewController alloc] init];
     }
     
+    float sysVersion=[[UIDevice currentDevice]systemVersion].floatValue;
+    if (sysVersion>=8.0) {
+        UIUserNotificationType type=UIUserNotificationTypeBadge | UIUserNotificationTypeAlert | UIUserNotificationTypeSound;
+        UIUserNotificationSettings *setting=[UIUserNotificationSettings settingsForTypes:type categories:nil];
+        [[UIApplication sharedApplication]registerUserNotificationSettings:setting];
+    }
+    
     // Override point for customization after application launch.
     return YES;
 }
@@ -48,8 +56,12 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    // 提醒操作系统：当前这个应用程序需要在后台开启一个任务
+    // 操作系统会允许这个应用程序在后台保持运行状态（能够持续的时间是不确定）
+    UIBackgroundTaskIdentifier taskID = [application beginBackgroundTaskWithExpirationHandler:^{
+        // 后台运行的时间到期了，就会自动调用这个block
+        [application endBackgroundTask:taskID];
+    }];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {

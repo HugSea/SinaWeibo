@@ -74,18 +74,15 @@
 - (void)accessTokenWithCode:(NSString *)code {
     
     // 创建请求参数
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"client_id"] = QJClient_id;
-    params[@"client_secret"] = QJClient_secret;
-    params[@"grant_type"] = @"authorization_code";
-    params[@"code"] = code;
-    params[@"redirect_uri"] = QJRedirect_uri;
+    QJAccessTokenParam *params = [[QJAccessTokenParam alloc] init];
+    params.client_id = QJClient_id;
+    params.client_secret = QJClient_secret;
+    params.grant_type = @"authorization_code";
+    params.code = code;
+    params.redirect_uri = QJRedirect_uri;
     
     // 发送POST请求
-    [QJHttpTool post:@"https://api.weibo.com/oauth2/access_token" params:params success:^(id responseObjt) {
-        // 字典转账户模型
-        QJAccount *account = [QJAccount accountWithDict:responseObjt];
-        
+    [QJAccountTool accessTokenWithParams:params success:^(QJAccount *account) {
         // 存储账号模型
         [QJAccountTool save:account];
         

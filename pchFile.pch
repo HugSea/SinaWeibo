@@ -16,8 +16,8 @@
 #import "UIBarButtonItem+Extension.h"
 
 // 当前屏幕宽高
-#define screenW [UIScreen mainScreen].bounds.size.width
-#define screenH [UIScreen mainScreen].bounds.size.height
+#define QJScreenW [UIScreen mainScreen].bounds.size.width
+#define QJScreenH [UIScreen mainScreen].bounds.size.height
 
 // 颜色设置
 #define QJColor(r, g, b) [UIColor colorWithRed:(r) / 255.0 green:(g) / 255.0 blue:(b) / 255.0 alpha:1.0]
@@ -26,5 +26,23 @@
 #define QJClient_id @"1372814960"
 #define QJClient_secret @"71d28540918e7730cf25caff29c04a18"
 #define QJRedirect_uri @"http://www.or2z.com"
+
+// cell的计算参数
+// cell的内边距
+#define QJStatusCellInset 10
+
+// 原创微博昵称字体
+#define QJStatusOrginalNameFont [UIFont systemFontOfSize:14]
+// 原创微博时间字体
+#define QJStatusOrginalTimeFont [UIFont systemFontOfSize:12]
+// 原创微博来源字体
+#define QJStatusOrginalSourceFont QJStatusOrginalTimeFont
+// 原创微博正文字体
+#define QJStatusOrginalTextFont [UIFont systemFontOfSize:15]
+
+// 转发微博昵称字体
+#define QJStatusRetweetedNameFont QJStatusOrginalNameFont
+// 转发微博正文字体
+#define QJStatusRetweetedTextFont QJStatusOrginalTextFont
 
 #endif

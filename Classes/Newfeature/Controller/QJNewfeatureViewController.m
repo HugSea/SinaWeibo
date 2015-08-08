@@ -37,15 +37,15 @@
     [self.view addSubview:scrollView];
     scrollView.delegate = self;
     
-    CGFloat imageW = screenW;
-    CGFloat imageH = screenH;
+    CGFloat imageW = QJScreenW;
+    CGFloat imageH = QJScreenH;
     CGFloat imageY = 0;
     for (int i = 0; i < QJNewfeatureImageCount; i++) {
         UIImageView *imageView = [[UIImageView alloc] init];
         [scrollView addSubview:imageView];
         CGFloat imageX = i * imageW;
         NSString *imageName = [NSString stringWithFormat:@"new_feature_%d", i + 1];
-        if (screenH > 480) {
+        if (QJScreenH > 480) {
             imageName = [imageName stringByAppendingString:@"-568h"];
         }
         [imageView setImage:[UIImage imageNamed:imageName]];
@@ -68,8 +68,8 @@
     [self.view addSubview:self.pageControl];
     // 设置pageControl属性
     self.pageControl.numberOfPages = QJNewfeatureImageCount;
-    self.pageControl.centerX = screenW * 0.5;
-    self.pageControl.centerY = screenH - 30;
+    self.pageControl.centerX = QJScreenW * 0.5;
+    self.pageControl.centerY = QJScreenH - 30;
     self.pageControl.currentPageIndicatorTintColor = QJColor(253, 98, 42);
     self.pageControl.pageIndicatorTintColor = QJColor(189, 189, 189);
 }
@@ -97,8 +97,8 @@
     [startBtn addTarget:self action:@selector(startBtnClicked) forControlEvents:UIControlEventTouchUpInside];
     startBtn.width = startBtn.currentBackgroundImage.size.width;
     startBtn.height = startBtn.currentBackgroundImage.size.height;
-    startBtn.centerX = screenW * 0.5;
-    startBtn.centerY = screenH * 0.8;
+    startBtn.centerX = QJScreenW * 0.5;
+    startBtn.centerY = QJScreenH * 0.8;
 }
 /**
  *  添加分享按钮
@@ -115,8 +115,8 @@
     shareBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 0);
     [shareBtn addTarget:self action:@selector(shareBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     shareBtn.size = CGSizeMake(150, 35);
-    shareBtn.centerX = screenW * 0.5;
-    shareBtn.centerY = screenH * 0.7;
+    shareBtn.centerX = QJScreenW * 0.5;
+    shareBtn.centerY = QJScreenH * 0.7;
                           
 }
 /**
@@ -137,7 +137,7 @@
 #pragma mark - scrollView代理方法
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    self.pageControl.currentPage = scrollView.contentOffset.x / screenW + 0.5;
+    self.pageControl.currentPage = scrollView.contentOffset.x / QJScreenW + 0.5;
 }
 
 @end

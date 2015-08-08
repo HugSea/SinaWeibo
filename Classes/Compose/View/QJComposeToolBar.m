@@ -53,7 +53,7 @@
     int count = (int)self.subviews.count;
     for (int i = 0; i < count; i++) {
         UIButton *btn = self.subviews[i];
-        btn.width = screenW / count;
+        btn.width = QJScreenW / count;
         btn.height = self.height;
         btn.y = 0;
         btn.x = i * btn.width;

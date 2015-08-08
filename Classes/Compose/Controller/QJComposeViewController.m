@@ -14,6 +14,7 @@
 #import "QJAccountTool.h"
 #import "QJAccount.h"
 #import "QJHttpTool.h"
+#import "QJStatusTool.h"
 
 @interface QJComposeViewController () <UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
@@ -116,7 +117,7 @@
  */
 - (void)setupToolBar {
     QJComposeToolBar *toolBar = [[QJComposeToolBar alloc] init];
-    toolBar.width = screenW;
+    toolBar.width = QJScreenW;
     toolBar.height = 44;
     toolBar.y = self.textView.height - toolBar.height;
     toolBar.x = 0;
@@ -153,7 +154,7 @@
     [self.textView addSubview:photoView];
     photoView.x = 0;
     photoView.y = 70;
-    photoView.width = screenW;
+    photoView.width = QJScreenW;
     photoView.height = self.textView.height;
     self.photoView = photoView;
 }
@@ -203,19 +204,19 @@
  */
 - (void)sendStatusWithImage {
     // 封装请求参数
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"access_token"] = [QJAccountTool account].access_token;
-    params[@"status"] = self.textView.text;
+    QJSendStatusParam *params = [[QJSendStatusParam alloc] init];
+    params.access_token = [QJAccountTool account].access_token;
+    params.status = self.textView.text;
     
     // 发送POST请求
-    [QJHttpTool post:@"https://upload.api.weibo.com/2/statuses/upload.json" params:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    [QJStatusTool SendStatusWithPhotoWithParams:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         UIImage *image = [self.photoView.images firstObject];
         
         NSData *data = UIImageJPEGRepresentation(image, 1.0);
         
         // 拼接文件参数
         [formData appendPartWithFileData:data name:@"pic" fileName:@"status.jpg" mimeType:@"image/jpeg"];
-    } success:^(id responseObjt) {
+    } success:^(QJSendStatusResult *result) {
         [MBProgressHUD showSuccess:@"发表成功"];
     } failure:^(NSError *error) {
         [MBProgressHUD showError:@"发表失败"];
@@ -226,12 +227,12 @@
  */
 - (void)sendStatusWithoutImage {
     // 封装请求参数
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"access_token"] = [QJAccountTool account].access_token;
-    params[@"status"] = self.textView.text;
+    QJSendStatusParam *params = [[QJSendStatusParam alloc] init];
+    params.access_token = [QJAccountTool account].access_token;
+    params.status = self.textView.text;
     
     // 发送POST请求
-    [QJHttpTool post:@"https://api.weibo.com/2/statuses/update.json" params:params success:^(id responseObjt) {
+    [QJStatusTool SendStatusWithoutPhotoWithParams:params success:^(QJSendStatusResult *result) {
         [MBProgressHUD showSuccess:@"发表成功"];
     } failure:^(NSError *error) {
         [MBProgressHUD showError:@"发表失败"];
