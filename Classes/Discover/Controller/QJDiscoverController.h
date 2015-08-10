@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "QJCommonViewController.h"
 
-@interface QJDiscoverController : UITableViewController
+@interface QJDiscoverController : QJCommonViewController
 
 @end

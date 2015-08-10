@@ -25,6 +25,7 @@
         // 预先创建9个图片控件
         for (int i = 0; i < kStatusPhotosMaxCount; i++) {
             QJStatusPhotoView *photoView = [[QJStatusPhotoView alloc] init];
+            photoView.tag = i;
             [self addSubview:photoView];
             
             // 添加手势监听器（一个手势监听器 只能 监听对应的一个view）
@@ -41,29 +42,29 @@
  */
 - (void)tapPhoto:(UITapGestureRecognizer *)recognizer
 {
-    // 添加一个盖板
-    UIView *cover = [[UIView alloc] init];
-    cover.frame = [UIScreen mainScreen].bounds;
-    cover.backgroundColor = [UIColor blackColor];
-    [[UIApplication sharedApplication].keyWindow addSubview:cover];
+    // 创建图片浏览器
+    MJPhotoBrowser *browser = [[MJPhotoBrowser alloc] init];
     
-    // 将图片加到盖板上
-    QJStatusPhotoView *photoView = (QJStatusPhotoView *)recognizer.view;
-    UIImageView *imageView = [[UIImageView alloc] init];
-    imageView.image = photoView.image;
-    // 将photoView.frame从self的坐标系转换为cover坐标系
-    imageView.frame = [cover convertRect:photoView.frame fromView:self];
-    [cover addSubview:imageView];
+    // 设置图片浏览器显示的所有图片
+    NSMutableArray *photos = [NSMutableArray array];
+    int count = (int)self.pic_urls.count;
+    for (int i = 0; i < count; i++) {
+        QJPhoto *pic = self.pic_urls[i];
+        
+        MJPhoto *photo = [[MJPhoto alloc] init];
+        // 设置图片的路径
+        photo.url = [NSURL URLWithString:pic.bmiddle_pic];
+        // 设置来源于哪一个ImageView
+        photo.srcImageView = self.subviews[i];
+        [photos addObject:photo];
+    }
+    browser.photos = photos;
     
-    // 放大
-    [UIView animateWithDuration:1.0 animations:^{
-        CGRect frame = imageView.frame;
-        frame.size.width = cover.width;
-        frame.size.height = frame.size.width * (imageView.height / imageView.width);
-        frame.origin.x = 0;
-        frame.origin.y = (cover.height - frame.size.height) * 0.5;
-        imageView.frame = frame;
-    }];
+    // 设置默认显示的图片索引
+    browser.currentPhotoIndex = recognizer.view.tag;
+    
+    // 显示浏览器
+    [browser show];
 }
 
 -(void)setPic_urls:(NSArray *)pic_urls {

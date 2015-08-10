@@ -8,6 +8,13 @@
 
 #import "QJDiscoverController.h"
 #import "QJSearchBar.h"
+#import "QJCommonGroup.h"
+#import "QJCommonItem.h"
+#import "QJCommonCell.h"
+#import "QJArrowItem.h"
+#import "QJSwitchItem.h"
+#import "QJLabelItem.h"
+
 
 @interface QJDiscoverController ()
 
@@ -24,73 +31,61 @@
    
     self.navigationItem.titleView = searchBar;
     
-}
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Potentially incomplete method implementation.
-    // Return the number of sections.
-    return 0;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete method implementation.
-    // Return the number of rows in the section.
-    return 0;
-}
-
-/*
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
+    // 初始化模型
+    [self setupGroups];
     
-    // Configure the cell...
+}
+
+- (void)setupGroups {
+    [self setupGroup0];
+    [self setupGroup1];
+    [self setupGroup2];
+}
+
+- (void)setupGroup0 {
+    // 创建组
+    QJCommonGroup *group = [QJCommonGroup group];
+    [self.groups addObject:group];
     
-    return cell;
+    // 设置组的所有行数据
+    QJArrowItem *hotStatus = [QJArrowItem itemWithTitle:@"热门微博" icon:@"hot_status"];
+    hotStatus.subtitle = @"笑话，娱乐，神最右都搬到这啦";
+    
+    QJArrowItem *findPeople = [QJArrowItem itemWithTitle:@"找人" icon:@"find_people"];
+    findPeople.subtitle = @"名人、有意思的人尽在这里";
+    
+    group.items = @[hotStatus, findPeople];
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (void)setupGroup1 {
+    // 1.创建组
+    QJCommonGroup *group = [QJCommonGroup group];
+    [self.groups addObject:group];
+    
+    // 2.设置组的所有行数据
+    QJSwitchItem *gameCenter = [QJSwitchItem itemWithTitle:@"游戏中心" icon:@"game_center"];
+    QJSwitchItem *near = [QJSwitchItem itemWithTitle:@"周边" icon:@"near"];
+    QJSwitchItem *app = [QJSwitchItem itemWithTitle:@"应用" icon:@"app"];
+    
+    group.items = @[gameCenter, near, app];
 }
-*/
 
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+- (void)setupGroup2 {
+    // 1.创建组
+    QJCommonGroup *group = [QJCommonGroup group];
+    [self.groups addObject:group];
+    
+    // 2.设置组的所有行数据
+    QJLabelItem *video = [QJLabelItem itemWithTitle:@"视频" icon:@"video"];
+    video.labelTitle = @"更多详情咨询";
+    QJCommonItem *music = [QJCommonItem itemWithTitle:@"音乐" icon:@"music"];
+    music.badgeValue = @"8";
+    QJCommonItem *movie = [QJCommonItem itemWithTitle:@"电影" icon:@"movie"];
+    movie.badgeValue = @"99+";
+    QJCommonItem *cast = [QJCommonItem itemWithTitle:@"播客" icon:@"cast"];
+    QJCommonItem *more = [QJCommonItem itemWithTitle:@"更多" icon:@"more"];
+    
+    group.items = @[video, music, movie, cast, more];
 }
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

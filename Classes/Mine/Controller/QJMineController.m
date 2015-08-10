@@ -7,6 +7,14 @@
 //
 
 #import "QJMineController.h"
+#import "QJSearchBar.h"
+#import "QJCommonGroup.h"
+#import "QJCommonItem.h"
+#import "QJCommonCell.h"
+#import "QJArrowItem.h"
+#import "QJSwitchItem.h"
+#import "QJLabelItem.h"
+
 
 @interface QJMineController ()
 
@@ -17,76 +25,42 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"设置" style:UIBarButtonItemStyleDone target:nil action:nil];
+    // 初始化模型
+    [self setupGroups];
     
 }
 
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-#warning Potentially incomplete method implementation.
-    // Return the number of sections.
-    return 0;
+- (void)setupGroups {
+    [self setupGroup0];
+    [self setupGroup1];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-#warning Incomplete method implementation.
-    // Return the number of rows in the section.
-    return 0;
-}
-
-/*
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:<#@"reuseIdentifier"#> forIndexPath:indexPath];
+- (void)setupGroup0 {
+    // 创建组
+    QJCommonGroup *group = [QJCommonGroup group];
+    [self.groups addObject:group];
     
-    // Configure the cell...
+    // 设置组的所有行数据
+    QJArrowItem *newFriendsStatus = [QJArrowItem itemWithTitle:@"新的好友" icon:@"new_friend"];
+    newFriendsStatus.destVcClass = [QJMineController class];
     
-    return cell;
+    group.items = @[newFriendsStatus];
 }
-*/
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
+- (void)setupGroup1 {
+    // 1.创建组
+    QJCommonGroup *group = [QJCommonGroup group];
+    [self.groups addObject:group];
+    
+    // 2.设置组的所有行数据
+    QJArrowItem *album = [QJArrowItem itemWithTitle:@"我的相册" icon:@"album"];
+    album.operation = ^() {
+        NSLog(@"------我的相册------");
+    };
+    QJArrowItem *collect = [QJArrowItem itemWithTitle:@"我的收藏" icon:@"collect"];
+    QJArrowItem *like = [QJArrowItem itemWithTitle:@"赞" icon:@"like"];
+    
+    group.items = @[album, collect, like];
 }
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

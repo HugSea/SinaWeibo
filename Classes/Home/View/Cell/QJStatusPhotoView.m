@@ -36,7 +36,6 @@
     _photo = photo;
     
     [self sd_setImageWithURL:[NSURL URLWithString:photo.thumbnail_pic] placeholderImage:[UIImage imageNamed:@"timeline_image_placeholder"]];
-    NSLog(@"%@", photo.thumbnail_pic);
     
     // 是否隐藏gif图片
     NSString *extension = photo.thumbnail_pic.pathExtension.lowercaseString;
